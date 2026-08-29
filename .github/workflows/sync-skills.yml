@@ -34,10 +34,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet; then
+          git add .claude/skills .continue/skills .junie/skills .trae/skills
+          if git diff --cached --quiet; then
             echo "No drift between .agents/skills and agent folders."
             exit 0
           fi
-          git add .claude/skills .continue/skills .junie/skills .trae/skills
           git commit -m "chore: sync skills from .agents (workspace) [skip ci]"
           git push
