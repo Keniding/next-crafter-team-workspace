@@ -1,10 +1,6 @@
-# Spec: repository
+# Spec: repository (MODIFIED — supersedes the baseline `openspec/specs/repository.md`)
 
-_Baseline. Last updated by `repository-cemetery-entity` (archived)._
-
-The cemetery entity is a **repository**: a GitHub-backed repo, or a manually buried entry (`packages/manual-entry`). Both share the same shape and lifecycle.
-
-## Requirement: identity and status
+## MODIFIED Requirement: identity and status
 
 A repository MUST have:
 
@@ -20,7 +16,7 @@ A repository MUST have:
 - `revivalCount`
 - `artifacts: Artifact[]` and `lineage: LineageEntry[]` (shapes defined in `packages/domain`)
 
-### Scenario: public autopsy hides source code
+### Scenario: public autopsy hides source code (unchanged)
 
 - GIVEN a repository with `visibility: public` and buried status
 - WHEN a visitor opens the detail screen
@@ -34,23 +30,21 @@ A repository MUST have:
 - THEN `githubFullName` MUST be absent and `githubSyncedAt` MUST stay `null`
 - AND every other field (status, visibility, autopsy, artifacts, lineage, reactions) MUST behave identically to a `github`-origin repository
 
-## Requirement: two clocks
-
-A repository MUST store two timestamps and MUST NOT collapse them:
+## Requirement: two clocks (unchanged)
 
 | Field | Updates when |
 | --- | --- |
 | `statusUpdatedAt` | cemetery status changes (bury / haunt / revive) |
-| `githubSyncedAt` | GitHub candidate data is pulled — `origin: github` only, stays `null` otherwise |
+| `githubSyncedAt` | GitHub candidate data is pulled — `origin: github` only |
 
-### Scenario: sync without status change
+### Scenario: sync without status change (unchanged)
 
 - GIVEN a buried repository with `origin: github`
 - WHEN GitHub sync runs and status stays `buried`
 - THEN `githubSyncedAt` MUST change
 - AND `statusUpdatedAt` MUST stay unchanged
 
-### Scenario: revive
+### Scenario: revive (unchanged)
 
 - GIVEN a buried repository, any origin
 - WHEN a user revives it
@@ -58,7 +52,7 @@ A repository MUST store two timestamps and MUST NOT collapse them:
 - AND `statusUpdatedAt` MUST change
 - AND `revivalCount` MUST increment
 - AND `lineage` MUST append a `LineageEntry` for the reviver from `packages/user`
-- AND `packages/notifications` MUST be told to notify the prior owner
+- AND `packages/notifications` MUST be told to notify the prior owner (see `notifications-module`)
 
 ## Requirement: owner can always find what they buried
 
@@ -71,11 +65,11 @@ A signed-in user MUST be able to list every repository they own, including `visi
 - THEN Convex MUST return all 5
 - AND a different, non-owner user requesting the same listing for that `ownerUserId` MUST only see the public ones
 
-## Requirement: detail screen fields
+## Requirement: detail screen fields (extended)
 
-The visual contract is `apps/mobile/mocks/repository-detail.html`. Runtime UI MAY be Expo, not that HTML file. The screen MUST be able to show: breadcrumb/category, status pill, origin pill (GitHub or manual), title, `githubFullName` when present, `stack` when present, buried age from `statusUpdatedAt`, reaction counts by kind, revival count, why it died, what was learned, the `artifacts` list (each rendered per its `kind`), `lineage` (who/what/when per entry), reaction buttons, revive CTA.
+The visual contract is `apps/mobile/mocks/repository-detail.html`. The screen MUST be able to show: breadcrumb/category, status pill, origin pill (GitHub or manual), title, `githubFullName` when present, `stack` when present, buried age from `statusUpdatedAt`, reaction counts by kind, revival count, why it died, what was learned, the `artifacts` list (each rendered per its `kind`), `lineage` (who/what/when per entry), reaction buttons, revive CTA.
 
-### Scenario: empty human fields
+### Scenario: empty human fields (unchanged)
 
 - GIVEN a GitHub candidate just imported, or a manual entry just drafted
 - WHEN detail is shown before the owner writes the autopsy

@@ -8,11 +8,12 @@ Show GitHub-sourced candidates and autopsies. No other networks.
 
 ## In scope
 
-- Screens via Convex React client
+- Screens via Convex React client: browse, repository detail, import (GitHub), upload (manual entry), "Mis recordatorios" (owner-scoped listing), notifications
 - Visit without account MAY be allowed
-- Writing an autopsy MUST require login
+- Writing an autopsy, uploading manually, reacting, and viewing "Mis recordatorios"/notifications MUST require login
 - Mounting `<ClerkProvider>` + `<ConvexProviderWithClerk>` and calling `useBusinessAuth()` for sign-in/out UI (both from `packages/auth`)
-- Calling `githubConnector.connect()` (from `packages/auth`'s sibling `packages/github` wrapper) to start a GitHub App installation
+- Calling `githubConnector.connect()` (from `packages/github`'s Expo wrapper) to start a GitHub App installation
+- Evidence upload in the manual-entry screen goes through a Convex-issued upload URL, never a third-party host
 
 ## Out of scope
 

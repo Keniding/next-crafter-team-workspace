@@ -8,15 +8,17 @@ Persist users, GitHub candidates, and autopsies. No other connectors, no other i
 
 ## In scope
 
-- Tables for users/ideas/candidates/ownership
-- Public visit vs owner-only private
+- Tables for users/ideas/candidates/ownership/reactions/notifications
+- Public visit vs owner-only private, plus an owner-scoped "my repositories" listing (reminders view)
 - `auth.config.ts` wired to Clerk's JWT issuer; `httpAction /clerk/webhook`
 - `httpAction /github/setup` and `httpAction /github/webhook` for the GitHub App installation flow
+- File-storage upload URL (`generateUploadUrl` action) for `packages/manual-entry` evidence — Convex owns the actual bytes; `packages/manual-entry` only ever handles the resulting `storageId`
+- Composing `packages/repository`'s revive flow with `packages/notifications`' `notifyOwner`
 - Actions that call `packages/auth` and `packages/github` with server secrets
 
 ## Out of scope
 
-- YouTube, Luma, Zernio
+- YouTube, Luma, Zernio, or any other live connector
 - React Native UI
 - A second database
 - Any auth provider besides Clerk

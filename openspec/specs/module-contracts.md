@@ -1,6 +1,6 @@
 # Spec: module layout
 
-_Baseline. Last updated by `business-auth-github-app` (archived)._
+_Baseline. Last updated by `module-contracts-add-modules` (archived)._
 
 ## Requirement: named MVP modules
 
@@ -15,8 +15,11 @@ The MVP MUST use these folders, each with `CONTRACT.md`:
 | github | `packages/github/` |
 | user | `packages/user/` |
 | repository | `packages/repository/` |
+| manual-entry | `packages/manual-entry/` |
+| reactions | `packages/reactions/` |
+| notifications | `packages/notifications/` |
 
-YouTube, Luma, Zernio, TikTok, Instagram, and LinkedIn MUST NOT be added without a dedicated change. No identity provider other than Clerk (via `packages/auth`) MUST be added — see `specs/auth.md`.
+YouTube, Luma, Zernio, TikTok, Instagram, and LinkedIn connectors (live API integrations) MUST NOT be added without a dedicated change — hand-typed content via `manual-entry` is not an exception to this. No identity provider other than Clerk (via `packages/auth`) MUST be added.
 
 ### Scenario: teammate opens a module
 
@@ -26,7 +29,20 @@ YouTube, Luma, Zernio, TikTok, Instagram, and LinkedIn MUST NOT be added without
 
 ## Requirement: dependency direction
 
-`apps/mobile` MUST depend only on Convex client APIs and `packages/auth`'s Expo wrapper (never Clerk hooks directly). `convex` MAY import `packages/auth`, `packages/github`, `packages/domain`, `packages/user`, and `packages/repository`. Connector and identity packages (`packages/github`, `packages/auth`) MUST NOT import `apps/**`.
+```text
+apps/mobile        → convex
+apps/mobile        → packages/auth        (session wrapper + provider mount)
+convex              → packages/auth
+convex              → packages/github
+convex              → packages/manual-entry → packages/domain
+convex              → packages/reactions    → packages/repository, packages/user (types only)
+convex              → packages/notifications → packages/repository, packages/user (types only)
+convex              → packages/repository → packages/user
+convex              → packages/domain
+packages/auth       → packages/user
+```
+
+`packages/reactions` and `packages/notifications` MUST NOT import each other or `packages/github`/`packages/auth` internals — only `convex` composes all of them.
 
 ### Scenario: forbidden import
 
@@ -35,32 +51,32 @@ YouTube, Luma, Zernio, TikTok, Instagram, and LinkedIn MUST NOT be added without
 - THEN the agent MUST NOT import `packages/github` or Clerk SDK types
 - AND MUST call a Convex query/mutation, or `useBusinessAuth()`, instead
 
+### Scenario: evidence upload stays in convex
+
+- GIVEN `packages/manual-entry` needs to accept a file
+- WHEN an agent implements the upload
+- THEN the actual file bytes MUST go through a Convex file-storage action (`convex/CONTRACT.md`)
+- AND `packages/manual-entry` MUST only ever handle the resulting `Artifact` reference, never raw file data
+
 ## Requirement: one spec file, one owner — collaborative edits MUST NOT collide in git
 
-Modules are implemented by different people in parallel. The folder-per-module layout above already isolates code (`packages/<name>/`, `apps/mobile/`, `convex/`) so two people editing different modules never touch the same file. This requirement extends that isolation to specs and process, so an active OpenSpec change never becomes a shared bottleneck file that many people edit at once.
+Modules are implemented by different people in parallel. The folder-per-module layout above already isolates code (`packages/<name>/`, `apps/mobile/`, `convex/`) so two people editing different modules never touch the same file. This requirement extends that isolation to specs and process.
 
 - A person working on module `X` MUST only edit `packages/X/CONTRACT.md` (or `convex/CONTRACT.md` / `apps/mobile/CONTRACT.md` for those two) and that module's own spec delta file (`specs/X.md`) inside their own change folder.
-- A spec or behavior change to a single module MUST live in its own `openspec/changes/<module>-<short-slug>/` folder, scoped to that module's files only (its `proposal.md`, `tasks.md`, and `specs/X.md`/`specs/flows.md` entries it touches). It MUST NOT be bundled into another module's change folder.
-- Cross-cutting files — the module table/dependency diagram in this spec, and any change's shared `flows.md` describing multiple modules — MUST be edited through their own small, fast-merged change, not as a side effect of one module's feature work. Whoever adds a new module or a new cross-module flow owns that specific change and keeps it short-lived.
-- `openspec/specs/` (this folder) is the merged baseline. Once a module's change is done, archive it into `openspec/changes/archive/<change-id>/` and fold its accepted deltas into the matching file here, so the next person branches from a stable baseline instead of a growing shared change.
+- A spec or behavior change to a single module MUST live in its own `openspec/changes/<module>-<short-slug>/` folder, scoped to that module's files only. It MUST NOT be bundled into another module's change folder.
+- Cross-cutting files — this module table/dependency diagram, and `specs/flows.md` — MUST be edited through their own small, fast-merged change, not as a side effect of one module's feature work.
+- `openspec/specs/` is the merged baseline. Once a module's change is done, archive it into `openspec/changes/archive/<change-id>/` and fold its accepted deltas into the matching file here.
 
 ### Scenario: two modules in flight at once
 
 - GIVEN person A opens `openspec/changes/github-app-repo-picker/` for `packages/github`
-- AND person B opens `openspec/changes/business-auth-mfa/` for `packages/auth`
+- AND person B opens `openspec/changes/reactions-add-kind/` for `packages/reactions`
 - WHEN both push to `main` around the same time
 - THEN their diffs MUST NOT touch any of the same files
 - AND neither branch requires a rebase against the other to merge cleanly
 
-### Scenario: a change needs a second module to change too
-
-- GIVEN implementing `packages/repository`'s revive flow also requires a small edit to `specs/flows.md` (shared)
-- WHEN the repository-module owner opens their change
-- THEN they MUST keep the `specs/flows.md` edit minimal and merge it quickly
-- AND MUST NOT hold it open while doing unrelated repository work in the same change, to avoid blocking other modules that also touch `flows.md`
-
 ### Scenario: forbidden cross-module edit
 
-- GIVEN an agent or teammate is implementing `packages/github`
-- WHEN they are tempted to also edit `packages/auth/CONTRACT.md` or `specs/auth.md` to "make it consistent"
-- THEN they MUST NOT — they open a note/issue for the `auth` owner instead, or a separate small change if it is genuinely their call to make
+- GIVEN an agent or teammate is implementing `packages/manual-entry`
+- WHEN they are tempted to also edit `packages/reactions/CONTRACT.md` "to make it consistent"
+- THEN they MUST NOT — they open a note/issue for the `reactions` owner instead, or a separate small change if it is genuinely their call to make
