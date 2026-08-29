@@ -1,0 +1,23 @@
+{
+  "name": "next-crafter-team-workspace",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Keniding/next-crafter-team-workspace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Keniding/next-crafter-team-workspace/issues"
+  },
+  "homepage": "https://github.com/Keniding/next-crafter-team-workspace#readme",
+  "dependencies": {
+    "convex": "^1.45.0"
+  }
+}
