@@ -1,0 +1,71 @@
+schema: spec-driven
+
+context: |
+  Project: next-crafter-team-workspace. Team collaboration workspace; no product application exists yet.
+  Official remote: https://github.com/Next-Crafter-Team/next-crafter-team-workspace.git (HEAD 682fc9e on main).
+  Backend choice: Convex ^1.45.0 in package.json; AGENTS.md and CLAUDE.md are Convex AI stubs. No convex/ directory, schema, or deployment.
+  Frontend/app: none. No src/, UI framework, tsconfig, or tests. README is a title only.
+  Current contents: Convex agent skill copies, skills-lock.json, and .github/workflows/sync-skills.yml mirroring .agents/skills.
+  Testing: npm test is a placeholder that exits 1. No runner, coverage, linter, typechecker, or formatter. strict_tdd is false.
+  Conventions: English technical artifacts. Do not invent product code or copy architecture from personal repos. Later product source is a Notion paste.
+  Persistence: OpenSpec. Do not scaffold an application until an SDD change defines it.
+
+persistence:
+  mode: openspec
+  artifact_store: openspec
+
+strict_tdd: false
+
+testing:
+  detected: "2026-08-29"
+  test_command: ""
+  test_runner: none
+  unit: false
+  integration: false
+  e2e: false
+  coverage_command: ""
+  linter_command: ""
+  typecheck_command: ""
+  formatter_command: ""
+  notes: "package.json scripts.test is a no-op placeholder (echo error, exit 1). Not a real test runner."
+
+preflight:
+  execution_mode: interactive
+  artifact_store: openspec
+  delivery_strategy: ask-on-risk
+  chained_pr_strategy: ask-on-risk
+  review_budget_lines: 400
+
+rules:
+  proposal:
+    - Do not invent a product application that does not exist.
+    - Treat Convex as the chosen backend only; do not assume a frontend stack.
+    - Product requirements come from a later Notion paste, not from this init.
+    - Include a rollback plan for risky changes.
+  specs:
+    - Use Given/When/Then for scenarios.
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY).
+    - Spec only what an approved change defines; do not backfill fictional domain specs.
+  design:
+    - Document architecture decisions with rationale.
+    - Do not copy architecture from personal repositories.
+    - When backend work is in scope, design for Convex (schema, queries, mutations, actions) without scaffolding unused subsystems.
+  tasks:
+    - Group by phase and use hierarchical numbering.
+    - Keep tasks completable in one session.
+    - Ask before selecting a chained PR strategy (ask-on-risk).
+    - Keep reviewable changes within 400 lines where practical.
+  apply:
+    guidelines:
+      - Do not implement product code until an SDD change defines it.
+      - Follow existing repo patterns; this repo currently has skills/docs, not application source.
+      - When writing Convex code, follow project Convex skills (convex-expert first for convex/ files).
+      - Recommend `npx convex ai-files install` before Convex implementation if convex/_generated/ai/guidelines.md is missing.
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas.
