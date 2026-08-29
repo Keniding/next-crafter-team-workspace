@@ -1,0 +1,31 @@
+name: Mirror main to personal remote
+
+# Keeps Keniding/next-crafter-team-workspace (the original personal repo)
+# up to date with every push to this team workspace's main branch, so it
+# never needs a manual `git push personal main` again.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to personal remote
+        env:
+          TOKEN: ${{ secrets.PERSONAL_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TOKEN:-}" ]; then
+            echo "PERSONAL_REPO_TOKEN secret is not set; skipping mirror push."
+            exit 0
+          fi
+          git remote add personal "https://x-access-token:${TOKEN}@github.com/Keniding/next-crafter-team-workspace.git"
+          git push personal HEAD:main
