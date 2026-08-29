@@ -1,0 +1,43 @@
+name: Sync skills from workspace
+
+# .agents/skills/ is the source of truth ("workspace" skills) and is expected
+# to change the most. Whenever it changes on main, mirror its contents into
+# the per-agent skill folders so every tool (Claude, Continue, Junie, Trae)
+# stays in sync without a manual copy step.
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".agents/skills/**"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror .agents/skills into agent-specific folders
+        run: |
+          set -euo pipefail
+          for target in .claude .continue .junie .trae; do
+            mkdir -p "$target/skills"
+            rsync -a --delete .agents/skills/ "$target/skills/"
+          done
+
+      - name: Commit and push if anything changed
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No drift between .agents/skills and agent folders."
+            exit 0
+          fi
+          git add .claude/skills .continue/skills .junie/skills .trae/skills
+          git commit -m "chore: sync skills from .agents (workspace) [skip ci]"
+          git push
